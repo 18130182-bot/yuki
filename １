@@ -1,4 +1,24 @@
-index.html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>生徒会ログイン</title>
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+</head>
+<body style="text-align:center; margin-top:100px;">
+
+<h2>生徒会専用ログイン</h2>
+
+<button id="login">Googleでログイン</button>
+
+<p id="status"></p>
+
+<div id="go" style="display:none;">
+  <a href="https://sites.google.com/kago.ed.jp/kushikino-junior-high-school/%E3%83%9B%E3%83%BC%E3%83%A0" target="_blank">
+    生徒会サイトへ進む
+  </a>
+</div>
+
 <script>
   let auth0 = null;
 
@@ -30,3 +50,6 @@ index.html
 
   init();
 </script>
+
+</body>
+</html>
