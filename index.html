@@ -15,19 +15,18 @@
 
   <script>
     function login() {
-      // クリック確認（これが出なければHTMLが壊れてる）
-      alert("ログイン開始");
-
       const domain = "dev-1gbk08kgbvlqcb8y.us.auth0.com";
       const clientId = "H39Rk7gfATWxlxfWahhAscEBooZx9MJb";
       const redirectUri = "https://18130182-bot.github.io/yuki/";
 
+      // ★ここが重要：Auth0の正規authorize URL
       const url =
         "https://" + domain + "/authorize" +
-        "?response_type=code" +
+        "?audience=" +
+        "&scope=openid%20profile%20email" +
+        "&response_type=code" +
         "&client_id=" + encodeURIComponent(clientId) +
         "&redirect_uri=" + encodeURIComponent(redirectUri) +
-        "&scope=openid%20profile%20email" +
         "&connection=google-oauth2";
 
       window.location.href = url;
