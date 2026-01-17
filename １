@@ -1,0 +1,31 @@
+<script>
+  let auth0 = null;
+
+  async function init() {
+    auth0 = await createAuth0Client({
+      domain: "dev-1gbk08kgbvlqcb8y.us.auth0.com",
+      clientId: "H39Rk7gfATWxlxfWahhAscEBooZx9MJb",
+      authorizationParams: {
+        redirect_uri: window.location.origin
+      }
+    });
+
+    if (location.search.includes("code=")) {
+      await auth0.handleRedirectCallback();
+      window.history.replaceState({}, document.title, "/");
+    }
+
+    const user = await auth0.getUser();
+    if (user) {
+      document.getElementById("status").textContent =
+        "ログイン成功：" + user.email;
+      document.getElementById("go").style.display = "block";
+    }
+  }
+
+  document.getElementById("login").onclick = async () => {
+    await auth0.loginWithRedirect();
+  };
+
+  init();
+</script>
