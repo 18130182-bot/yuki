@@ -3,61 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>生徒会ログイン</title>
-  <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 </head>
 
 <body style="text-align:center; margin-top:100px; font-family:sans-serif;">
 
   <h2>生徒会専用ログイン</h2>
 
-  <button id="login" style="font-size:16px; padding:10px 20px;">
+  <button onclick="login()" style="font-size:16px; padding:10px 20px;">
     Googleでログイン
   </button>
 
-  <p id="status"></p>
-
-  <div id="go" style="display:none; margin-top:20px;">
-    <a href="https://sites.google.com/kago.ed.jp/kushikino-junior-high-school/%E3%83%9B%E3%83%BC%E3%83%A0"
-       target="_blank">
-      生徒会サイトへ進む
-    </a>
-  </div>
-
   <script>
-    let auth0;
+    function login() {
+      // クリック確認（これが出なければHTMLが壊れてる）
+      alert("ログイン開始");
 
-    async function init() {
-      auth0 = await createAuth0Client({
-        domain: "dev-1gbk08kgbvlqcb8y.us.auth0.com",
-        clientId: "H39Rk7gfATWxlxfWahhAscEBooZx9MJb",
-        authorizationParams: {
-          redirect_uri: "https://18130182-bot.github.io/yuki/"
-        }
-      });
+      const domain = "dev-1gbk08kgbvlqcb8y.us.auth0.com";
+      const clientId = "H39Rk7gfATWxlxfWahhAscEBooZx9MJb";
+      const redirectUri = "https://18130182-bot.github.io/yuki/";
 
-      // Auth0 から戻ってきたとき
-      if (location.search.includes("code=")) {
-        await auth0.handleRedirectCallback();
-        window.history.replaceState({}, document.title, "/yuki/");
-      }
+      const url =
+        "https://" + domain + "/authorize" +
+        "?response_type=code" +
+        "&client_id=" + encodeURIComponent(clientId) +
+        "&redirect_uri=" + encodeURIComponent(redirectUri) +
+        "&scope=openid%20profile%20email" +
+        "&connection=google-oauth2";
 
-      const user = await auth0.getUser();
-      if (user) {
-        document.getElementById("status").textContent =
-          "ログイン成功：" + user.email;
-        document.getElementById("go").style.display = "block";
-      }
+      window.location.href = url;
     }
-
-    document.getElementById("login").onclick = async () => {
-      await auth0.loginWithRedirect({
-        authorizationParams: {
-          connection: "google-oauth2"
-        }
-      });
-    };
-
-    init();
   </script>
 
 </body>
