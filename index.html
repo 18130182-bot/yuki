@@ -24,17 +24,18 @@
   </div>
 
   <script>
-    let auth0 = null;
+    let auth0;
 
     async function init() {
       auth0 = await createAuth0Client({
         domain: "dev-1gbk08kgbvlqcb8y.us.auth0.com",
         clientId: "H39Rk7gfATWxlxfWahhAscEBooZx9MJb",
         authorizationParams: {
-          redirect_uri: window.location.origin + "/yuki/"
+          redirect_uri: "https://18130182-bot.github.io/yuki/"
         }
       });
 
+      // Auth0 から戻ってきたとき
       if (location.search.includes("code=")) {
         await auth0.handleRedirectCallback();
         window.history.replaceState({}, document.title, "/yuki/");
