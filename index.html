@@ -5,32 +5,59 @@
   <title>生徒会ログイン</title>
   <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 </head>
-<body style="text-align:center; margin-top:100px;">
 
-<h2>生徒会専用ログイン</h2>
+<body style="text-align:center; margin-top:100px; font-family:sans-serif;">
 
-<button id="login">Googleでログイン</button>
+  <h2>生徒会専用ログイン</h2>
 
-<p id="status"></p>
+  <button id="login" style="font-size:16px; padding:10px 20px;">
+    Googleでログイン
+  </button>
 
-<div id="go" style="display:none;">
-  <a href="https://sites.google.com/kago.ed.jp/kushikino-junior-high-school/%E3%83%9B%E3%83%BC%E3%83%A0" target="_blank">
-    生徒会サイトへ進む
-  </a>
-</div>
+  <p id="status"></p>
 
-<script>
-  let auth0 = null;
+  <div id="go" style="display:none; margin-top:20px;">
+    <a href="https://sites.google.com/kago.ed.jp/kushikino-junior-high-school/%E3%83%9B%E3%83%BC%E3%83%A0"
+       target="_blank">
+      生徒会サイトへ進む
+    </a>
+  </div>
 
-  async function init() {
-    auth0 = await createAuth0Client({
-      domain: "dev-1gbk08kgbvlqcb8y.us.auth0.com",
-      clientId: "H39Rk7gfATWxlxfWahhAscEBooZx9MJb",
-      authorizationParams: {
-        redirect_uri: window.location.origin
+  <script>
+    let auth0 = null;
+
+    async function init() {
+      auth0 = await createAuth0Client({
+        domain: "dev-1gbk08kgbvlqcb8y.us.auth0.com",
+        clientId: "H39Rk7gfATWxlxfWahhAscEBooZx9MJb",
+        authorizationParams: {
+          redirect_uri: window.location.origin + "/yuki/"
+        }
+      });
+
+      if (location.search.includes("code=")) {
+        await auth0.handleRedirectCallback();
+        window.history.replaceState({}, document.title, "/yuki/");
       }
-    });
 
-    if (location.search.includes("code=")) {
-      await auth0.handleRedirectCallback();
-      window.history.replaceState({}, document.title, "/");
+      const user = await auth0.getUser();
+      if (user) {
+        document.getElementById("status").textContent =
+          "ログイン成功：" + user.email;
+        document.getElementById("go").style.display = "block";
+      }
+    }
+
+    document.getElementById("login").onclick = async () => {
+      await auth0.loginWithRedirect({
+        authorizationParams: {
+          connection: "google-oauth2"
+        }
+      });
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
