@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>生徒会ログイン</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      background: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      width: 360px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(18px);
+      border-radius: 20px;
+      padding: 40px;
+      color: #fff;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pop {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .login-card h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    .input-group label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-top: 6px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .attempt-box {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      font-size: 14px;
+      text-align: center;
+    }
+    .attempt-danger { color: #ffb3b3; }
+    .attempt-warning { color: #ffe08a; }
+    .attempt-safe { color: #9cffb5; }
+    footer {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="welcome" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);color:#fff;z-index:999;align-items:center;justify-content:center;flex-direction:column;">
+    <h1 style="font-size:36px;animation:pop 0.8s ease;">ようこそ</h1>
+    <p style="animation:fade 1.5s ease;">串木野中学校 生徒会サイトへ</p>
+  </div>
+
+  <div class="login-card">
+    <h1>ログイン</h1>
+    <div class="input-group">
+      <label>ユーザーID</label>
+      <input id="userId" type="text" placeholder="ユーザーIDを入力" />
+    </div>
+    <div class="input-group">
+      <label>パスワード</label>
+      <input id="password" type="password" placeholder="パスワードを入力" />
+    </div>
+    <button class="login-btn" onclick="login()">ログイン</button>
+    <div id="msg" class="message"></div>
+    <div id="attempt" class="attempt-box"></div>
+    <footer>© 2026 生徒会ログインシステム</footer>
+  </div>
+
+<script>
+  const CORRECT_ID = "384750";
+  const CORRECT_PASSWORD = "Smyr5972";
+  const DEFAULT_ADMINS = ["18130182@kago.ed.jp"];
+  const MAX_FAIL = 2;
+  const LOCK_TIME = 3 * 60 * 1000;
+
+  let failCount = Number(localStorage.getItem('failCount')) || 0;
+  let lockUntil = Number(localStorage.getItem('lockUntil')) || 0;
+  let admins = JSON.parse(localStorage.getItem('admins')) || DEFAULT_ADMINS;
+
+  function addAdmin(id) {
+    if (!admins.includes(id)) {
+      admins.push(id);
+      localStorage.setItem('admins', JSON.stringify(admins));
+      alert(id + " を管理者として追加しました");
+    }
+  }
+
+  function login() {
+    const id = userId.value;
+    const pw = password.value;
+    const msg = document.getElementById('msg');
+    const attempt = document.getElementById('attempt');
+    const now = Date.now();
+
+    if (lockUntil && now < lockUntil) {
+      const remain = Math.ceil((lockUntil - now) / 1000);
+      attempt.textContent = `🔒 ロック中：${remain}秒後に解除`;
+      attempt.className = "attempt-box attempt-danger";
+      return;
+    }
+
+    if (pw === CORRECT_PASSWORD && (id === CORRECT_ID || admins.includes(id))) {
+      msg.textContent = admins.includes(id)
+        ? "管理者でログインしました"
+        : "ログイン成功しました";
+      msg.className = "message";
+      attempt.textContent = admins.includes(id)
+        ? "👑 管理者として認証されました"
+        : "✅ 認証に成功しました";
+      attempt.className = "attempt-box attempt-safe";
+
+      localStorage.removeItem('failCount');
+      localStorage.removeItem('lockUntil');
+
+      document.querySelector('.login-card').style.display = 'none';
+      document.getElementById('welcome').style.display = 'flex';
+
+      setTimeout(() => {
+        if (admins.includes(id)) {
+          location.href = "https://sites.google.com/d/1surEvKrmk193xviR-oWXF78YJEq7_SET/p/1s6jkHqtRXhCfjOm-_5zbZgTwdXbadY0N/edit";
+        } else {
+          location.href = "https://sites.google.com/kago.ed.jp/kushikino-junior-high-school/%E3%83%9B%E3%83%BC%E3%83%A0";
+        }
+      }, 2000);
+    } else {
+      failCount++;
+      localStorage.setItem('failCount', failCount);
+
+      msg.textContent = "IDまたはパスワードが違います";
+      msg.className = "message";
+
+      if (failCount >= MAX_FAIL) {
+        lockUntil = now + LOCK_TIME;
+        localStorage.setItem('lockUntil', lockUntil);
+        attempt.textContent = "⛔ 3分間ロックされます";
+        attempt.className = "attempt-box attempt-danger";
+      } else {
+        const remain = MAX_FAIL - failCount;
+        attempt.textContent = `⚠ 残り ${remain} 回まで試行できます`;
+        attempt.className = "attempt-box attempt-warning";
+      }
+    }
+  }
+</script>
+</body>
+</html>
